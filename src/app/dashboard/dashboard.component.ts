@@ -10,33 +10,33 @@ import { TotemSocketService } from './../totem-socket.service';
 })
 
 export class DashboardComponent implements OnInit {
-  agents:any;
+  agents:number;
   msg:string;
+  socketId:string;
   alerta=true;
   tipo:any;
   private layout: any = 'alphanumeric';
   constructor(public sails:TotemSocketService, private ref:ChangeDetectorRef) {
-    this.agents={
-      'A':0,
-      'B':0,
-      'C':0
-    };
+    this.agents=0;
   }
 
   ngOnInit() {
       $("#default").keyboard();
     this.sails.conectToTotem()
     .subscribe(data=>{
-      console.log(data.verb);
+      console.log(data);
       if(data.verb=="joined"){
         this.agents=data.agents
-        this.agentsInit(data.agents)
+        this.socketId=data.socketID
       }else if(data.verb=="agent_logeed"){
-        this.agents[data.type]++;
+        this.agents++;
       }else if(data.verb=="agent_logout"){
-        this.agents[data.type]--;
-      }else if(data.verb=="alert"){
-        this.shotAlert(data);
+        this.agents--;
+      }else if(data.verb=="alert_totem"){
+        //this.shotAlert(data);
+        if(this.socketId==data.socketId){
+          alert('Tu turno');
+        }
       }
       this.ref.detectChanges();
     })
@@ -45,12 +45,12 @@ export class DashboardComponent implements OnInit {
   agentsInit(agents){
     this.agents=agents;
   }
-  shotAlert(data){
+  /*shotAlert(data){
     console.log('data', data);
     if(data.msg == 1){
       this.agents['A']++;
     }
-  }
+  }*/
   getmsg(){
     this.sails.sendMsg();
   }
@@ -60,8 +60,9 @@ export class DashboardComponent implements OnInit {
   }
 
   llamar(){
-    let msj = {'tipo':this.tipo,'curp':$("#default").val()}
-    this.sendMensaje(msj);
+    let msj = {type:this.tipo,curp:$("#default").val(), socketId:this.socketId}
+    console.log(msj);
+    this.sails.totemLogIn(msj);
   }
   focus(tipo){
     this.tipo = tipo;

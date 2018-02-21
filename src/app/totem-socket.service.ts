@@ -12,10 +12,11 @@ export class TotemSocketService {
   io = this.sailsIOClient(this.socketIOClient);
 
   constructor() {
+    //this.io.sails.url = 'http://localhost:1337';
     this.io.sails.url = 'https://still-mountain-91576.herokuapp.com';
-    this.io.socket.get('/user/subscribeToRoom', function(response) {
+    /*this.io.socket.get('/user/subscribeToAgentsConect', function(response) {
       //observer.next(response);
-    })
+    })*/
 
   }
   public conectToTotem(): Observable<any> {
@@ -23,12 +24,17 @@ export class TotemSocketService {
       this.io.socket.on('totem', function(response){
         observer.next(response);
       })
-      this.io.socket.get('/user/subscribeToRoom', function(response) {
+      this.io.socket.get('/user/subscribeToAgentsConect', function(response) {
         observer.next(response);
       })
 
     })
 
+  }
+  public totemLogIn(data){
+    this.io.socket.put('/user/totemLogIn', data, (response)=>{
+      console.log(response);
+    });
   }
   public sendMsg(){
     this.io.socket.get('/user/emitToRoom', function(data, response) {
