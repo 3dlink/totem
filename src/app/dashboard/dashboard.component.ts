@@ -15,6 +15,8 @@ export class DashboardComponent implements OnInit {
   socketId:string;
   alerta=true;
   tipo:any;
+  clients:any;
+  atendido:boolean=false;
   private layout: any = 'alphanumeric';
   constructor(public sails:TotemSocketService, private ref:ChangeDetectorRef) {
     this.agents=0;
@@ -27,6 +29,7 @@ export class DashboardComponent implements OnInit {
       console.log(data);
       if(data.verb=="joined"){
         this.agents=data.agents
+        this.clients=data.totems
         this.socketId=data.socketID
       }else if(data.verb=="agent_logeed"){
         this.agents++;
@@ -34,9 +37,16 @@ export class DashboardComponent implements OnInit {
         this.agents--;
       }else if(data.verb=="alert_totem"){
         //this.shotAlert(data);
-        if(this.socketId==data.socketId){
-          alert('Tu turno');
-        }
+        if(this.atendido){
+          if(this.socketId==data.socketId){
+            this.atendido=false;
+            alert('Tu turno');
+          }else{
+            this.getPosition()
+          }  
+        }        
+      }else if(data.verb=="totem_call"){
+        this.clients.push(data.totem);
       }
       this.ref.detectChanges();
     })
@@ -63,12 +73,28 @@ export class DashboardComponent implements OnInit {
     let msj = {type:this.tipo,curp:$("#default").val(), socketId:this.socketId}
     console.log(msj);
     this.sails.totemLogIn(msj);
+    this.atendido=true;
   }
   focus(tipo){
     this.tipo = tipo;
     setTimeout(function(){
         $("#default").focus();
     }, 500);
+  }
+  getPosition(){
+    this.tipo
+    let position=0;
+    for(let x in this.clients){
+      if( this.clients[x].type == this.tipo){
+        if( this.clients[x].socketID == this.socketId){
+          position++;
+          break;
+        }else{
+          position++;
+        }
+      }
+    }
+    alert('eres el: '+ position +' en la fila');
   }
 
 }
