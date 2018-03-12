@@ -11,18 +11,20 @@ import { TotemSocketService } from './totem-socket.service';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { StyleComponent } from './style/style.component';
 
 const appRoutes:Routes = [
   {
     path: '',
-    component:DashboardComponent
+    component:StyleComponent
   }
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent
+    DashboardComponent,
+    StyleComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
